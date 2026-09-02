@@ -1,0 +1,29 @@
+[project]
+readme = "README.md"
+license = {file = "LICENSE"}
+keywords = ["python", "deep-research", "ai-agents", "research-automation", "knowledge-management", "provenance", "workflow-automation"]
+name = "researcher"
+version = "0.1.0"
+description = "A stateless deep-research engine that builds durable claims and evidence"
+requires-python = ">=3.11"
+dependencies = ["llmwiki>=0.1.0"]
+# llmwiki is the one supported library-level integration. Install it from the
+# public package index or from an independently obtained checkout before use.
+
+[project.scripts]
+research = "researcher.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["researcher*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[project.urls]
+Repository = "https://github.com/abetor/researcher"
+Documentation = "https://github.com/abetor/researcher#readme"
+Issues = "https://github.com/abetor/researcher/issues"
