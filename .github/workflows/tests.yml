@@ -1,0 +1,45 @@
+name: Tests
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+        working-directory: tool-researcher
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: tool-researcher
+          persist-credentials: false
+      # llmwiki is a runtime dependency. Both paths are under GITHUB_WORKSPACE,
+      # so tool-llm-wiki is ../tool-llm-wiki from the shell working directory.
+      - uses: actions/checkout@v4
+        with:
+          repository: abetor/llm-wiki
+          ref: main
+          path: tool-llm-wiki
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install
+        run: |
+          python3 -m pip install -e ../tool-llm-wiki
+          python3 -m pip install -e .
+          python3 -m pip install 'pytest>=8'
+      - name: Test
+        env:
+          # Keep subprocess imports on these checkouts, as in the local test gate.
+          PYTHONPATH: ${{ github.workspace }}/tool-researcher:${{ github.workspace }}/tool-llm-wiki
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q -p no:cacheprovider
