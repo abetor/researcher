@@ -76,3 +76,7 @@ Use English for code, comments, documentation, diagnostics, and commit messages.
 Use no emoji or dash characters in place of a plain hyphen. Keep commit subjects
 short and imperative; use the body to explain why. Do not add abstractions or
 configuration without a current need.
+
+## Non-English test fixtures
+
+Code, comments, docstrings, CLI help, and diagnostics are English. The remaining Russian strings (a few dozen lines) are deliberate: multilingual test fixtures for Cyrillic slug generation, Unicode search terms, Russian transcript segmentation, filename byte budgets, and mixed-language course metadata; a bilingual regex in the knowledge-substrate gate; and the `INDEX.md` markers of the external course-corpus format that `course_import` parses. Keep them: the characters are the subject of those tests.

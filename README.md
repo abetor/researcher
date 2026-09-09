@@ -1,8 +1,10 @@
-# tool-researcher
+# researcher
 
-`tool-researcher` turns a research question or an authorized course transcript into a durable, auditable corpus of claims, evidence, sources, and wiki pages.
+[![Tests](https://github.com/abetor/researcher/actions/workflows/tests.yml/badge.svg)](https://github.com/abetor/researcher/actions/workflows/tests.yml)
 
-[Quick start](#quick-start) | [Offline demo](#demo) | [Architecture](docs/DESIGN.md) | [Tests](#tests) | [Contributing and agent guide](AGENTS.md) | [MIT license](LICENSE)
+`researcher` runs resumable research workflows: it turns a question or an authorized course transcript into linked sources, claims, evidence, and wiki pages. Progress lives in topic files, so a later process can resume a run after a quota or process failure.
+
+[Quick start](#quick-start) | [Offline setup smoke](#offline-setup-smoke) | [Architecture](docs/DESIGN.md) | [Tests](#tests) | [Contributing and agent guide](AGENTS.md) | [MIT license](LICENSE)
 
 ## Problem
 
@@ -73,9 +75,15 @@ python3 -m researcher status "$topic_dir" --short
 
 Use `python3 -m researcher --help` and the subcommand help for the full interface.
 
-## Demo
+Generated prompts ask the model to answer in Russian by default. That is a product default of
+the original deployment, not a translation leftover; edit the prompt strings in
+`researcher/pages.py`, `researcher/report.py`, and `researcher/course_import.py` for English output.
 
-The hermetic demo creates a clean topic without network or credentials:
+## Offline setup smoke
+
+This smoke creates a clean topic without network or credentials. It checks installation and
+topic layout only: no collect, extract, verify, promote, or pages phase runs, and it does not
+exercise resume after a failure. Those phases are covered by the test suite with fake harnesses.
 
 ```bash
 demo_root="$(mktemp -d)"
@@ -83,7 +91,9 @@ python3 -m researcher start "Public release smoke test" --base "$demo_root" --no
 python3 -m researcher status --base "$demo_root"
 ```
 
-Expected result: the topic is created, its search plan waits for review, and status reads only files under `demo_root`.
+Expected result: `start` prints the topic path and `topic ready, checkpoint planned`; `status`
+lists the topic in phase `planned` with zero sources and claims, reading only files under
+`demo_root`.
 
 ## Data and credential boundary
 
@@ -99,8 +109,8 @@ Credentials are read only from the process environment. Supported names include 
   `doctor` location check expects that layout and may warn about otherwise importable
   installations elsewhere. This release does not claim a standalone package-index setup.
 - Live harness and network checks under `smoke/` are deliberately outside the hermetic test gate.
-- Code, comments, docstrings, CLI help, and diagnostics are English. The remaining Russian strings (a few dozen lines) are deliberate: multilingual test fixtures for Cyrillic slug generation, Unicode search terms, Russian transcript segmentation, filename byte budgets, and mixed-language course metadata; a bilingual regex in the knowledge-substrate gate; and the `INDEX.md` markers of the external course-corpus format that `course_import` parses.
-- Generated prompts still ask the model to answer in Russian. That is a product default of the original deployment, not a leftover of translation; change it in the prompt templates if you need English output.
+- Test fixtures include Russian and mixed-language text where multilingual behavior itself is under test: Cyrillic slug generation, Unicode search terms, transcript segmentation, filename byte budgets.
+- Generated prompts ask the model to answer in Russian by default; see the quick start.
 
 ## Tests
 
@@ -119,6 +129,11 @@ demo_root="$(mktemp -d)"
 python3 -m researcher start "Public release smoke test" --base "$demo_root" --no-run
 python3 -m researcher status --base "$demo_root" --json
 ```
+
+## Provenance
+
+This repository began as a public source snapshot of a personal tool. Earlier local development
+history is not included.
 
 ## License
 
