@@ -11,28 +11,36 @@ permissions:
 
 jobs:
   tests:
+    name: Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # Oldest supported version from pyproject.toml and the current release.
+        python-version: ["3.11", "3.13"]
     defaults:
       run:
         shell: bash
         working-directory: tool-researcher
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: tool-researcher
           persist-credentials: false
       # llmwiki is a runtime dependency. Both paths are under GITHUB_WORKSPACE,
       # so tool-llm-wiki is ../tool-llm-wiki from the shell working directory.
-      - uses: actions/checkout@v4
+      # The ref is pinned so a rerun of this commit tests against the same dependency;
+      # bump it deliberately when a newer llm-wiki is required.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: abetor/llm-wiki
-          ref: main
+          ref: ab9fb48562b68d1c8e2bfbb6a94ec1c4c4cf4c6c # main, 2026-09-09
           path: tool-llm-wiki
           persist-credentials: false
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
       - name: Install
         run: |
           python3 -m pip install -e ../tool-llm-wiki
