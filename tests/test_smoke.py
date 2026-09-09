@@ -1615,7 +1615,7 @@ def test_public_readme_has_release_gate_sections():
         "## What it does",
         "## Architecture",
         "## Quick start",
-        "## Demo",
+        "## Offline setup smoke",
         "## Limitations",
         "## Data and credential boundary",
         "## Tests",
